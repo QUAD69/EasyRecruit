@@ -10,11 +10,11 @@ declare(strict_types=1);
  */
 function getOrderDetails(int $order_id): array
 {
-	/*
-	 * В реальном проекте подключение к базе нужно вынести, запрос строить с помощью QueryBuilder.
-	 */
+    /*
+     * В реальном проекте подключение к базе нужно вынести, запрос строить с помощью QueryBuilder.
+     */
     $pdo = new PDO('mysql:host=127.0.0.1;dbname=easyrecruit;charset=utf8mb4', 'root', 'root');
-	$stmt = $pdo->prepare(<<<SQL
+    $stmt = $pdo->prepare(<<<SQL
 SELECT 
     p.id, 
     p.name, 
@@ -27,33 +27,33 @@ WHERE
     op.order_id = ?
 SQL);
 
-	if (!$stmt->execute([$order_id])) {
-		throw new Exception('Unable execute SQL query.');
-	}
-	
-	$products = $stmt->fetchAll(PDO::FETCH_ASSOC);
-	$totalPrice = 0;
-	$finalPrice = 0;
-	
-	foreach ($products as &$product) {
-		[
-			'price' => $price,
-			'discount' => $discount,
-			'amount' => $amount
-		] = $product;
-		
-		$totalPrice += $price * $amount;
-		$finalPrice += $price * $amount * (1 - $discount);
-	}
-	
-	return [
-		'products' => $products,
-		'summary' => [
-			'total_price' => $totalPrice,
-			'final_price' => $finalPrice,
-			'saved' => $totalPrice - $finalPrice
-		]
-	];
+    if (!$stmt->execute([$order_id])) {
+        throw new Exception('Unable execute SQL query.');
+    }
+    
+    $products = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $totalPrice = 0;
+    $finalPrice = 0;
+    
+    foreach ($products as &$product) {
+        [
+            'price' => $price,
+            'discount' => $discount,
+            'amount' => $amount
+        ] = $product;
+        
+        $totalPrice += $price * $amount;
+        $finalPrice += $price * $amount * (1 - $discount);
+    }
+    
+    return [
+        'products' => $products,
+        'summary' => [
+            'total_price' => $totalPrice,
+            'final_price' => $finalPrice,
+            'saved' => $totalPrice - $finalPrice
+        ]
+    ];
 }
 
 try {
